@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run build --prefix client\"",
     "build": "npm run build --prefix client",
     "start": "cross-env NODE_ENV=production npm start --prefix server"
   },
