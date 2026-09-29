@@ -35,8 +35,8 @@ const BlogsForm = ({ createBlog }) => {
           placeholder='insert title'
         />
       </div>
-    
-      <div style={{ marginTop: '10px'}}>
+
+      <div style={{ marginTop: '10px' }}>
         <TextField
           id='author'
           sx={inputSx}
@@ -47,10 +47,10 @@ const BlogsForm = ({ createBlog }) => {
         />
       </div>
 
-      <div style={{ marginTop: '10px'}}>
+      <div style={{ marginTop: '10px' }}>
         <TextField
-        id='url'
-        sx={inputSx}
+          id='url'
+          sx={inputSx}
           type="text"
           value={url}
           onChange={(e) => setUrl(e.target.value)}

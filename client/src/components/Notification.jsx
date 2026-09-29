@@ -5,9 +5,9 @@ const Notification = ({ succesNotitication }) => {
 
   return (
     <div>
-       <Alert style={{ marginTop: 10, marginBottom: 10}} severity={succesNotitication.type}>
+      <Alert style={{ marginTop: 10, marginBottom: 10 }} severity={succesNotitication.type}>
         {succesNotitication.text}
-       </Alert>
+      </Alert>
     </div>
   )
 }

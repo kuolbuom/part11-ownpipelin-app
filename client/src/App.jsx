@@ -191,7 +191,7 @@ const App = () => {
       {/* {user && (<div><p>{user.name} loged in <button onClick={handleLogout}>logout</button></p></div>)} */}
 
 
-      {/*       
+      {/*
               {!user &&
                 <Togglable buttonLabel='login'>
                   <LoginForm

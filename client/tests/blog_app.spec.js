@@ -2,17 +2,17 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Blog app', () => {
   test.beforeEach(async ({ page, request }) => {
-    await request.post('http://localhost:3003/api/testing/reset')
+    await request.post('http://127.0.0.1:3004/api/testing/reset')
 
-    await request.post('http://localhost:3003/api/users', {
+    await request.post('http://127.0.0.1:3004/api/users', {
       data: {
         name: 'Matti Luukkainen',
         username: 'mluukkai',
-        password: 'salainen'
-      }
+        password: 'salainen',
+      },
     })
 
-    await page.goto('http://localhost:5173')
+    await page.goto('/')
   })
 
   test.describe('login', () => {
@@ -22,7 +22,7 @@ test.describe('Blog app', () => {
       await page.getByLabel('username').fill('mluukkai')
       await page.getByLabel('password').fill('salainen')
 
-      await page.getByRole('button', { name: 'login' }).click()
+      await page.locator('form').getByRole('button', { name: 'login' }).click()
 
       await expect(page.getByRole('button', { name: 'logout' })).toBeVisible()
     })
@@ -33,11 +33,9 @@ test.describe('Blog app', () => {
       await page.getByLabel('username').fill('mluukkai')
       await page.getByLabel('password').fill('wrong')
 
-      await page.getByRole('button', { name: 'login' }).click()
+      await page.locator('form').getByRole('button', { name: 'login' }).click()
 
-      await expect(
-        page.getByText('wrong username or password')
-      ).toBeVisible()
+      await expect(page.getByText('wrong username or password')).toBeVisible()
     })
 
     test.describe('when logged in', () => {
@@ -47,12 +45,14 @@ test.describe('Blog app', () => {
         await page.getByLabel('username').fill('mluukkai')
         await page.getByLabel('password').fill('salainen')
 
-        await page.getByRole('button', { name: 'login' }).click()
+        await page
+          .locator('form')
+          .getByRole('button', { name: 'login' })
+          .click()
       })
 
       test('A logged in user can create a blog', async ({ page }) => {
-
-        await page.getByRole('link', { name: 'new blog' }).click()
+        await page.getByRole('link', { name: 'New Blog', exact: true }).click()
 
         await page.locator('#title').fill('Playwright Blog')
         await page.locator('#author').fill('Kuol')
@@ -60,20 +60,13 @@ test.describe('Blog app', () => {
 
         await page.getByRole('button', { name: 'create' }).click()
 
-
-
-        await page.waitForTimeout(1000)
-        console.log(await page.url())
-        await page.pause()
-
         await expect(
-          page.getByRole('link', { name: 'Playwright Blog Kuol' })
+          page.getByRole('link', { name: 'Playwright Blog Kuol' }),
         ).toBeVisible()
       })
 
       test('A logged in user can like a blog', async ({ page }) => {
-
-        await page.getByRole('link', { name: 'new blog' }).click()
+        await page.getByRole('link', { name: 'New Blog', exact: true }).click()
 
         await page.locator('#title').fill('Playwright Blog')
         await page.locator('#author').fill('Kuol')
@@ -83,24 +76,13 @@ test.describe('Blog app', () => {
 
         await page.getByRole('link', { name: 'Playwright Blog Kuol' }).click()
 
-        await page.waitForTimeout(1000)
-        console.log(await page.url())
-        await page.pause()
-
-
-
-        // await page.getByText('Like Test').click()
-
         await page.getByRole('button', { name: 'like' }).click()
 
-        await expect(
-          page.getByText('likes 1')
-        ).toBeVisible()
+        await expect(page.getByText('likes 1')).toBeVisible()
       })
 
       test('A logged in user can delete a blog', async ({ page }) => {
-
-        await page.getByRole('link', { name: 'new blog' }).click()
+        await page.getByRole('link', { name: 'New Blog', exact: true }).click()
 
         await page.locator('#title').fill('Playwright Blog')
         await page.locator('#author').fill('Kuol')
@@ -108,18 +90,16 @@ test.describe('Blog app', () => {
 
         await page.getByRole('button', { name: 'create' }).click()
 
-        await page.getByRole('link', {name: 'Playwright Blog Kuol'}).click()
+        await page.getByRole('link', { name: 'Playwright Blog Kuol' }).click()
 
-         await page.getByRole('button', { name: 'remove' }).click()
+        page.on('dialog', (dialog) => dialog.accept())
 
-        page.on('dialog', dialog => dialog.accept())
+        await page.getByRole('button', { name: 'remove' }).click()
 
-         await expect(
-          page.getByRole('link', { name: 'Playwright Blog Kuol' })
+        await expect(
+          page.getByRole('link', { name: 'Playwright Blog Kuol' }),
         ).not.toBeVisible()
       })
     })
-
   })
 })
-
