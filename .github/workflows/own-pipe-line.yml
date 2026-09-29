@@ -1,0 +1,55 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize]
+jobs:
+  test_and_build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # lint and test ci/cd
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install client dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Install server dependencies
+        working-directory: server
+        run: npm ci
+
+      - name: Lint client
+        working-directory: client
+        run: npm run lint
+
+      - name: Test client
+        working-directory: client
+        run: npm test
+
+      - name: Test server
+        working-directory: server
+        run: npm test
+
+      - name: Build client
+        working-directory: client
+        run: npm run build
+
+        # playwright ci/cd
+      - name: Install Playwright browsers
+        working-directory: client
+        run: npx playwright install --with-deps
+
+      - name: Run E2E tests
+        working-directory: client
+        run: npm run test:e2e
