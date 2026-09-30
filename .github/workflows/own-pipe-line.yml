@@ -4,15 +4,18 @@ on:
   push:
     branches:
       - master
+
   pull_request:
-    branches: [master]
+    branches:
+      - master
     types: [opened, synchronize]
+
 jobs:
   test_and_build:
     runs-on: ubuntu-latest
 
     steps:
-      # lint and test ci/cd
+      # Lint and test CI/CD
       - name: Checkout repository
         uses: actions/checkout@v6
 
@@ -45,7 +48,7 @@ jobs:
         working-directory: client
         run: npm run build
 
-        # playwright ci/cd
+      # Playwright CI/CD
       - name: Install Playwright browsers
         working-directory: client
         run: npx playwright install --with-deps
@@ -61,3 +64,16 @@ jobs:
           name: playwright-report
           path: client/playwright-report/
           retention-days: 30
+
+  # Deployment to Render
+  deploy:
+    needs: test_and_build
+    runs-on: ubuntu-latest
+
+    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' '), '#skip') }}
+
+    steps:
+      - name: Deploy to Render
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: curl "$RENDER_DEPLOY_HOOK"
