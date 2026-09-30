@@ -124,3 +124,30 @@ jobs:
             **Author:** ${{ github.event.head_commit.author.name }}
 
             [View Commit](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+  # notify for failure
+  notify_failure:
+    needs: [test_and_build, deploy, tag_release]
+    if: ${{ failure() && github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Discord failure notification
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: Failure
+          title: "Build Failed!"
+          description: |
+            The pipeline encountered an error.
+
+            **Failure Details**
+
+            **Repository:** ${{ github.repository }}
+            **Branch:** ${{ github.ref_name }}
+            **Commit:** ${{ github.sha }}
+            **Message:** ${{ github.event.head_commit.message }}
+            **Author:** ${{ github.event.head_commit.author.name }}
+            **Workflow:** Deployment pipeline
+
+            [View Commit](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+            [View Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
